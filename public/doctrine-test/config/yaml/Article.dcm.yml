@@ -1,0 +1,14 @@
+# config/yaml/Article.dcm.yml
+Article:
+  type: entity
+  table: articles
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    title:
+      type: string
+    body:
+      type: string
