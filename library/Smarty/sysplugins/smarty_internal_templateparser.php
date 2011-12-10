@@ -126,6 +126,9 @@ class Smarty_Internal_Templateparser#line 79 "smarty_internal_templateparser.php
     }
 
     public function compileVariable($variable) {
+        echo $variable."\n";
+        //print_r($this->yystack);
+        //print_call_stack();
         if (strpos($variable,'(') == 0) {
             // not a variable variable
             $var = trim($variable,'\'');
@@ -2144,20 +2147,39 @@ static public $yy_action = array(
     );
 #line 94 "smarty_internal_templateparser.y"
     function yy_r0(){
+        echo "yy_r0: (root_buffer->to_smarty_php()\n";
     $this->_retvalue = $this->root_buffer->to_smarty_php();
     }
 #line 2145 "smarty_internal_templateparser.php"
 #line 102 "smarty_internal_templateparser.y"
     function yy_r1(){
+        echo "yy_r1: (append_subtree) ";
+        //print_r($this->yystack[$this->yyidx + 0]->minor);
+        echo "\n";
     $this->current_buffer->append_subtree($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 2150 "smarty_internal_templateparser.php"
 #line 118 "smarty_internal_templateparser.y"
     function yy_r4(){
+        
     if ($this->compiler->has_code) {
+        echo "    Fancy stuff 1\n";
         $tmp =''; foreach ($this->compiler->prefix_code as $code) {$tmp.=$code;} $this->compiler->prefix_code=array();
+        echo "yy_r4: ";
+        echo "Tmp: ".$tmp."\n";
+        echo "Minor: ".$this->yystack[$this->yyidx + 0]->minor."\n";
+        $tag = new _smarty_tag($this, $this->compiler->processNocacheCode($tmp.$this->yystack[$this->yyidx + 0]->minor,true));
+        echo $tag->saved_block_nesting."\n";
+        foreach ($tag as $key => $val) {
+            echo $key."\n";
+        }
+        
+        echo "--end--\n";
         $this->_retvalue = new _smarty_tag($this, $this->compiler->processNocacheCode($tmp.$this->yystack[$this->yyidx + 0]->minor,true));
     } else {
+        echo "yy_r4: ";
+        //print_r(new _smarty_tag($this, $this->yystack[$this->yyidx + 0]->minor));
+        echo "\n";
         $this->_retvalue = new _smarty_tag($this, $this->yystack[$this->yyidx + 0]->minor);
     }
     $this->compiler->has_variable_string = false;
@@ -2303,6 +2325,7 @@ static public $yy_action = array(
 #line 2299 "smarty_internal_templateparser.php"
 #line 266 "smarty_internal_templateparser.y"
     function yy_r19(){
+    echo "yy_r19: ".$this->yystack[$this->yyidx + 0]->minor."\n";
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
 #line 2304 "smarty_internal_templateparser.php"
@@ -2328,6 +2351,7 @@ static public $yy_action = array(
 #line 2324 "smarty_internal_templateparser.php"
 #line 300 "smarty_internal_templateparser.y"
     function yy_r26(){
+        echo "yy_r26: (compileTag: private_print_expression)".$this->yystack[$this->yyidx + -1]->minor."\n";
     $this->_retvalue = $this->compiler->compileTag('private_print_expression',array(),array('value'=>$this->yystack[$this->yyidx + -1]->minor));
     }
 #line 2329 "smarty_internal_templateparser.php"
@@ -2775,15 +2799,47 @@ static public $yy_action = array(
 #line 2771 "smarty_internal_templateparser.php"
 #line 898 "smarty_internal_templateparser.y"
     function yy_r142(){
+        GLOBAL $MOCK_OBJECTS;
+        echo "yy_r142\n";
+        //print_r($this->yystack[$this->yyidx + -1]->minor);
+        //echo "\n";
+        
     if ($this->yystack[$this->yyidx + -1]->minor['var'] == '\'smarty\'') {
         $this->_retvalue =  $this->compiler->compileTag('private_special_variable',array(),$this->yystack[$this->yyidx + -1]->minor['smarty_internal_index']).$this->yystack[$this->yyidx + 0]->minor;
     } else {
+        $object_name = str_replace("'", "", $this->yystack[$this->yyidx + -1]->minor['var']);
+        $object = (object) $MOCK_OBJECTS[$object_name];
+        if (empty($object)) {
+            echo "New object\n";
+            $object = new StdClass();
+        }
+        $cur_object = &$object;
+        $calls = $this->yystack[$this->yyidx + 0]->minor;
+        foreach (split("->", $calls) as $call) {
+            echo "Test:\n";
+            echo "Call: ".$call;
+            echo "\n";
+            if (!empty($call)) {
+                if (empty($cur_object->$call)) {
+                    $cur_object->$call = new StdClass();
+                }
+                $cur_object = & $cur_object->$call;
+            }
+        }
+        echo "blah:";
+        print_r($object);
+        $MOCK_OBJECTS[$object_name] = $object;
+        echo "\n";
+        echo $this->yystack[$this->yyidx + -1]->minor['var']."\n";
+        echo $this->yystack[$this->yyidx + 0]->minor."\n";
         $this->_retvalue = $this->compileVariable($this->yystack[$this->yyidx + -1]->minor['var']).$this->yystack[$this->yyidx + -1]->minor['smarty_internal_index'].$this->yystack[$this->yyidx + 0]->minor;
     }
+    echo "yy_r142 ext.: {$this->_retvalue}\n";
     }
 #line 2780 "smarty_internal_templateparser.php"
 #line 907 "smarty_internal_templateparser.y"
     function yy_r143(){
+        echo "yy_r143: ".$this->yystack[$this->yyidx + 0]->minor."\n";
     $this->_retvalue  = $this->yystack[$this->yyidx + 0]->minor;
     }
 #line 2785 "smarty_internal_templateparser.php"
@@ -2797,6 +2853,7 @@ static public $yy_action = array(
     if ($this->security && substr($this->yystack[$this->yyidx + -1]->minor,0,1) == '_') {
         $this->compiler->trigger_template_error (self::Err1);
     }
+    echo "yy_r145: ".'->'.$this->yystack[$this->yyidx + -1]->minor.$this->yystack[$this->yyidx + 0]->minor."\n";
     $this->_retvalue = '->'.$this->yystack[$this->yyidx + -1]->minor.$this->yystack[$this->yyidx + 0]->minor;
     }
 #line 2798 "smarty_internal_templateparser.php"
@@ -3061,6 +3118,7 @@ static public $yy_action = array(
         if (array_key_exists($yyruleno, self::$yyReduceMap)) {
             // call the action
             $this->_retvalue = null;
+            echo "yyruleno: ".self::$yyReduceMap[$yyruleno]."\n";
             $this->{'yy_r' . self::$yyReduceMap[$yyruleno]}();
             $yy_lefthand_side = $this->_retvalue;
         }
@@ -3127,6 +3185,7 @@ static public $yy_action = array(
 
     function doParse($yymajor, $yytokenvalue)
     {
+        echo $this->yyidx ." | " . $yymajor. " | $yytokenvalue\n";
         $yyerrorhit = 0;   /* True if yymajor has invoked an error */
 
         if ($this->yyidx === null || $this->yyidx < 0) {
@@ -3147,6 +3206,8 @@ static public $yy_action = array(
 
         do {
             $yyact = $this->yy_find_shift_action($yymajor);
+            echo "Action: {$yyact}\n";
+            echo self::YYNSTATE."\n";
             if ($yymajor < self::YYERRORSYMBOL &&
                   !$this->yy_is_expected_token($yymajor)) {
                 // force a syntax error
